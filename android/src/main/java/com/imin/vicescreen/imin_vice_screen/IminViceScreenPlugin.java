@@ -198,24 +198,40 @@ public class IminViceScreenPlugin implements FlutterPlugin, ActivityAware, Metho
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        channel.setMethodCallHandler(null);
-        viceScreenChannel.setMethodCallHandler(null);
+        try {
+            if (channel != null) channel.setMethodCallHandler(null);
+            if (viceScreenChannel != null) viceScreenChannel.setMethodCallHandler(null);
+        } catch (Exception e)
+        {
+            // Silent
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void onAttachedToActivity(ActivityPluginBinding binding) {
-        IminViceScreenProvider.getInstance().setFlutterSubCallback(new IFlutterSubCallback() {
-            @Override
-            public void onSubFlutterEngineCreated() {
-                //副屏 engine 初始化后，将副屏事件进行分发
-                if (IminViceScreenProvider.getInstance().engine != null) {
-                    onCreateViceChannel(IminViceScreenProvider.getInstance().engine.getDartExecutor());
+        try {
+            IminViceScreenProvider.getInstance().setFlutterSubCallback(new IFlutterSubCallback() {
+                @Override
+                public void onSubFlutterEngineCreated() {
+                    //副屏 engine 初始化后，将副屏事件进行分发
+                    try {
+                        if (IminViceScreenProvider.getInstance().engine != null) {
+                            onCreateViceChannel(IminViceScreenProvider.getInstance().engine.getDartExecutor());
+                        }
+                    } catch (Exception e2)
+                    {
+                        // Silent
+                    }
                 }
-            }
-        });
-        boolean autoShowSubScreenWhenInit = _context.getResources().getBoolean(R.bool.autoShowSubScreenWhenInit);
-        IminViceScreenProvider.getInstance().doInit(binding.getActivity(), autoShowSubScreenWhenInit);
+            });
+
+            boolean autoShowSubScreenWhenInit = _context.getResources().getBoolean(R.bool.autoShowSubScreenWhenInit);
+            IminViceScreenProvider.getInstance().doInit(binding.getActivity(), autoShowSubScreenWhenInit);
+        } catch (Exception e)
+        {
+            // Silent
+        }
     }
 
     @Override
@@ -230,7 +246,12 @@ public class IminViceScreenPlugin implements FlutterPlugin, ActivityAware, Metho
 
     @Override
     public void onDetachedFromActivity() {
-        IminViceScreenProvider.getInstance().onDispose();
+        try {
+            IminViceScreenProvider.getInstance().onDispose();
+        } catch (Exception e)
+        {
+            // Silent
+        }
     }
 
     public static IminViceScreenPlugin getInstance() {
